@@ -22,18 +22,19 @@ contract CCNCarnival {
     event RefundIssued(uint256 indexed stallId, address indexed to, uint256 amount);
     event Withdrawal(uint256 indexed stallId, address indexed owner, uint256 amount);
 
+    // Modifier to restrict actions to the stall owner (student or staff)
     modifier onlyStallOwner(uint256 stallId) {
         require(stalls[stallId].owner == msg.sender, "Not stall owner");
         _;
     }
 
-    // Register a new stall with its operating duration
+    // Students and staff register a stall; msg.sender becomes the owner
     function registerStall(StallDuration duration) external returns (uint256) {
         stallCount++;
         uint256 stallId = stallCount;
 
         Stall storage s = stalls[stallId];
-        s.owner = msg.sender;
+        s.owner = msg.sender; // Owner is always msg.sender
         s.duration = duration;
         s.status = StallStatus.Registered;
 
@@ -43,7 +44,7 @@ contract CCNCarnival {
         return stallId;
     }
 
-    // Public users make payments to a stall
+    // Anyone can pay to a stall by stallId
     function payToStall(uint256 stallId) external payable {
         require(stalls[stallId].owner != address(0), "Invalid stall");
         require(stalls[stallId].status == StallStatus.Registered, "Stall not accepting payments");
@@ -55,7 +56,7 @@ contract CCNCarnival {
         emit PaymentReceived(stallId, msg.sender, msg.value);
     }
 
-    // Stall owner refunds a user (full or partial)
+    // Only the stall owner (msg.sender) can issue refunds from their stall
     function refund(uint256 stallId, address payable to, uint256 amount) external onlyStallOwner(stallId) {
         require(stalls[stallId].payments[to] >= amount, "Refund exceeds payment");
         require(stalls[stallId].balance >= amount, "Insufficient balance in stall");
@@ -69,13 +70,13 @@ contract CCNCarnival {
         emit RefundIssued(stallId, to, amount);
     }
 
-    // Mark stall as closed (should be called when the stall's operating period is over)
+    // Only the stall owner can close their stall after their days have elapsed
     function closeStall(uint256 stallId) external onlyStallOwner(stallId) {
         require(stalls[stallId].status == StallStatus.Registered, "Stall already closed or withdrawn");
         stalls[stallId].status = StallStatus.Closed;
     }
 
-    // Stall owner withdraws funds after closing their stall
+    // Only the stall owner can withdraw funds after closing
     function withdraw(uint256 stallId) external onlyStallOwner(stallId) {
         require(stalls[stallId].status == StallStatus.Closed, "Stall not closed yet");
         require(stalls[stallId].balance > 0, "Nothing to withdraw");
@@ -90,7 +91,7 @@ contract CCNCarnival {
         emit Withdrawal(stallId, msg.sender, amount);
     }
 
-    // View functions
+    // View stall details
     function getStall(uint256 stallId) external view returns (
         address owner,
         StallDuration duration,
@@ -101,10 +102,12 @@ contract CCNCarnival {
         return (s.owner, s.duration, s.status, s.balance);
     }
 
+    // View how much a user has paid to a stall
     function getUserPayment(uint256 stallId, address user) external view returns (uint256) {
         return stalls[stallId].payments[user];
     }
 
+    // View which stalls an address owns
     function getOwnerStalls(address owner) external view returns (uint256[] memory) {
         return ownerStalls[owner];
     }

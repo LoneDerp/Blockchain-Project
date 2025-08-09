@@ -17,6 +17,31 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "FundsWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "payer",
 						"type": "address"
 					},
@@ -27,7 +52,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "PaymentReceived",
+				"name": "PaymentMade",
 				"type": "event"
 			},
 			{
@@ -72,7 +97,13 @@
 					},
 					{
 						"indexed": false,
-						"internalType": "enum CCNCarnival.StallDuration",
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "enum CCNCarnival2025.Duration",
 						"name": "duration",
 						"type": "uint8"
 					}
@@ -81,57 +112,56 @@
 				"type": "event"
 			},
 			{
-				"anonymous": false,
-				"inputs": [
+				"inputs": [],
+				"name": "carnivalStart",
+				"outputs": [
 					{
-						"indexed": true,
 						"internalType": "uint256",
-						"name": "stallId",
-						"type": "uint256"
-					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "amount",
+						"name": "",
 						"type": "uint256"
 					}
 				],
-				"name": "Withdrawal",
-				"type": "event"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "stallId",
-						"type": "uint256"
-					}
-				],
-				"name": "closeStall",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
 				"inputs": [
 					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					}
+				],
+				"name": "getPayers",
+				"outputs": [
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
 						"internalType": "address",
-						"name": "owner",
+						"name": "user",
 						"type": "address"
 					}
 				],
-				"name": "getOwnerStalls",
+				"name": "getPayment",
 				"outputs": [
 					{
-						"internalType": "uint256[]",
+						"internalType": "uint256",
 						"name": "",
-						"type": "uint256[]"
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -153,62 +183,37 @@
 						"type": "address"
 					},
 					{
-						"internalType": "enum CCNCarnival.StallDuration",
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "enum CCNCarnival2025.Duration",
 						"name": "duration",
 						"type": "uint8"
 					},
 					{
-						"internalType": "enum CCNCarnival.StallStatus",
-						"name": "status",
-						"type": "uint8"
+						"internalType": "uint256",
+						"name": "totalFunds",
+						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "balance",
+						"name": "withdrawTime",
 						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "withdrawn",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "stallId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "user",
-						"type": "address"
-					}
-				],
-				"name": "getUserPayment",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "ownerStalls",
+				"inputs": [],
+				"name": "oneDay",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -227,7 +232,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "payToStall",
+				"name": "payStall",
 				"outputs": [],
 				"stateMutability": "payable",
 				"type": "function"
@@ -240,7 +245,7 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "address payable",
+						"internalType": "address",
 						"name": "to",
 						"type": "address"
 					},
@@ -258,7 +263,12 @@
 			{
 				"inputs": [
 					{
-						"internalType": "enum CCNCarnival.StallDuration",
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "enum CCNCarnival2025.Duration",
 						"name": "duration",
 						"type": "uint8"
 					}
@@ -291,6 +301,69 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "stallExists",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "stalls",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "enum CCNCarnival2025.Duration",
+						"name": "duration",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalFunds",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "withdrawTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "withdrawn",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
 						"name": "stallId",
 						"type": "uint256"
 					}
@@ -314,7 +387,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"CCNProject.sol": "CCNCarnival"
+			"CCNProjectV2.sol": "CCNCarnival2025"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -328,12 +401,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"CCNProject.sol": {
-			"keccak256": "0xa1d78938a997aaa22455dac6ec7c0c8c9e29fab76652af99b76cecce6e006df6",
+		"CCNProjectV2.sol": {
+			"keccak256": "0xf3832bec45ceb40abdf7b40af2ebcbacfc193956a158073ba92c13122e20521f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9942c20f02e0a60f5411fd385b5c88fc8e3fae3292b03877e423a5dc200df72b",
-				"dweb:/ipfs/QmYLkK5Ex3vT5vw8419CTkDJpunCp7mUuwLp3ZryD9CXY2"
+				"bzz-raw://a6681508c6c6aab97e421a8d68be6003d47e2c32b7bb2e833a99a50d859a80d2",
+				"dweb:/ipfs/QmWa3qSeW3mVrpNovigLUFMaekbq1xyG77AiCUqGDMhKW8"
 			]
 		}
 	},
