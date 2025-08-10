@@ -97,6 +97,37 @@
 					},
 					{
 						"indexed": false,
+						"internalType": "uint256",
+						"name": "time",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "reason",
+						"type": "string"
+					}
+				],
+				"name": "StallClosed",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
 						"internalType": "string",
 						"name": "name",
 						"type": "string"
@@ -122,6 +153,19 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					}
+				],
+				"name": "closeStall",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -201,6 +245,11 @@
 						"internalType": "uint256",
 						"name": "withdrawTime",
 						"type": "uint256"
+					},
+					{
+						"internalType": "enum CCNCarnival2025.Status",
+						"name": "status",
+						"type": "uint8"
 					},
 					{
 						"internalType": "bool",
@@ -352,6 +401,11 @@
 						"type": "uint256"
 					},
 					{
+						"internalType": "enum CCNCarnival2025.Status",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
 						"internalType": "bool",
 						"name": "withdrawn",
 						"type": "bool"
@@ -387,7 +441,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"CCNProjectV2.sol": "CCNCarnival2025"
+			"CCNProjectV3.sol": "CCNCarnival2025"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -401,12 +455,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"CCNProjectV2.sol": {
-			"keccak256": "0xf3832bec45ceb40abdf7b40af2ebcbacfc193956a158073ba92c13122e20521f",
+		"CCNProjectV3.sol": {
+			"keccak256": "0xe73e3ec0c83a1a09df47cc451693ad8f4e741f13d97c10a793e73029d4bc86ab",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a6681508c6c6aab97e421a8d68be6003d47e2c32b7bb2e833a99a50d859a80d2",
-				"dweb:/ipfs/QmWa3qSeW3mVrpNovigLUFMaekbq1xyG77AiCUqGDMhKW8"
+				"bzz-raw://f87d0ba1ef3f8be643e882bd0bccd5ceba9b0db136c8fec7af9f331c9520c0cd",
+				"dweb:/ipfs/QmQjgJBDLP3cMS6BH2nYdyGM5s687r6Pfi9fmS9qmKAS6H"
 			]
 		}
 	},
