@@ -1,6 +1,6 @@
 let web3;
 let contract;
-const contractAddress = "0x57F880e6e326c9e913C38c876cAD0D6b8892a019";
+const contractAddress = "0xF311a1A5E80aB004eEb554667314ccc4F5d8CDaC";
 const contractABI = [
     {
         "inputs": [
@@ -76,6 +76,24 @@ const contractABI = [
         "name": "payStall",
         "outputs": [],
         "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "rating",
+                "type": "uint8"
+            }
+        ],
+        "name": "rateStall",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -193,6 +211,31 @@ const contractABI = [
             {
                 "indexed": true,
                 "internalType": "address",
+                "name": "rater",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "rating",
+                "type": "uint8"
+            }
+        ],
+        "name": "StallRated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
                 "name": "owner",
                 "type": "address"
             },
@@ -246,6 +289,30 @@ const contractABI = [
                 "type": "uint256"
             }
         ],
+        "name": "getAverageRating",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "avgRating",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "ratingsCount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            }
+        ],
         "name": "getPayers",
         "outputs": [
             {
@@ -276,6 +343,30 @@ const contractABI = [
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "getRating",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
             }
         ],
         "stateMutability": "view",
@@ -419,6 +510,16 @@ const contractABI = [
                 "internalType": "bool",
                 "name": "withdrawn",
                 "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "ratingsSum",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "ratingsCount",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -473,6 +574,7 @@ async function loadStalls() {
         div.className = 'stall';
         let paymentsHtml = '';
         let ownerActionsHtml = '';
+        let ratingHtml = '';
         let accounts = [];
         try {
             accounts = await web3.eth.getAccounts();
@@ -483,6 +585,41 @@ async function loadStalls() {
         if (s[5] == '0') { statusText = 'Open'; statusColor = 'green'; }
         else if (s[5] == '1' || s[5] == '2') { statusText = 'Closed'; statusColor = 'red'; }
         else if (s[5] == '3') { statusText = 'Withdrawn'; statusColor = 'goldenrod'; }
+
+        // --- Ratings ---
+        // Get average rating and count
+        let avgRating = 0;
+        let ratingsCount = 0;
+        try {
+            const ratingData = await contract.methods.getAverageRating(i).call();
+            avgRating = ratingData[0];
+            ratingsCount = ratingData[1];
+        } catch { }
+        // Get current user's rating
+        let userRating = 0;
+        if (accounts.length > 0) {
+            try {
+                userRating = await contract.methods.getRating(i, accounts[0]).call();
+            } catch { }
+        }
+        // Show average rating
+        ratingHtml += `<p><b>Rating:</b> ${ratingsCount > 0 ? `${avgRating} / 5 (${ratingsCount} ratings)` : 'No ratings yet'}</p>`;
+        // Show rating form if not owner
+        if (accounts.length > 0 && accounts[0].toLowerCase() !== s[0].toLowerCase()) {
+            ratingHtml += `<div class="rate-stall">
+				<label>Rate this stall: </label>
+				<select id="rate-select-${i}">
+					<option value="">--</option>
+					<option value="1" ${userRating == 1 ? 'selected' : ''}>1</option>
+					<option value="2" ${userRating == 2 ? 'selected' : ''}>2</option>
+					<option value="3" ${userRating == 3 ? 'selected' : ''}>3</option>
+					<option value="4" ${userRating == 4 ? 'selected' : ''}>4</option>
+					<option value="5" ${userRating == 5 ? 'selected' : ''}>5</option>
+				</select>
+				<button onclick="rateStall(${i})">Submit</button>
+				<span id="rate-msg-${i}"></span>
+			</div>`;
+        }
 
         // Only show payments and owner actions if the connected user is the owner
         if (accounts.length > 0 && accounts[0].toLowerCase() === s[0].toLowerCase()) {
@@ -511,6 +648,7 @@ async function loadStalls() {
 	  <p><b>Total Funds:</b> ${web3.utils.fromWei(s[3], 'ether')} ETH</p>
 	  <p><b>Withdraw Time:</b> ${new Date(s[4] * 1000).toLocaleString()}</p>
 	  <p><b>Withdrawn:</b> ${s[6] ? 'Yes' : 'No'}</p>
+	  ${ratingHtml}
 	  ${paymentsHtml}
 	  <div class="stall-actions">
 		<button onclick="payStall(${i})">Pay</button>
@@ -519,6 +657,25 @@ async function loadStalls() {
 	  </div>`;
         stallList.appendChild(div);
     }
+    // Rate stall function
+    window.rateStall = async (stallId) => {
+        const select = document.getElementById(`rate-select-${stallId}`);
+        const msg = document.getElementById(`rate-msg-${stallId}`);
+        const rating = select.value;
+        if (!rating) {
+            msg.innerText = 'Please select a rating.';
+            return;
+        }
+        const accounts = await web3.eth.getAccounts();
+        contract.methods.rateStall(stallId, parseInt(rating)).send({ from: accounts[0] })
+            .on('receipt', () => {
+                msg.innerText = 'Thank you for rating!';
+                loadStalls();
+            })
+            .on('error', err => {
+                msg.innerText = err.message;
+            });
+    };
 }
 
 window.payStall = async (stallId) => {
