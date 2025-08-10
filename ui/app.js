@@ -1,7 +1,20 @@
 let web3;
 let contract;
-const contractAddress = "0x668e6401bb070EFa385a15c8ab814049B7fb6716";
+const contractAddress = "0x57F880e6e326c9e913C38c876cAD0D6b8892a019";
 const contractABI = [
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            }
+        ],
+        "name": "closeStall",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
     {
         "anonymous": false,
         "inputs": [
@@ -154,6 +167,37 @@ const contractABI = [
             },
             {
                 "indexed": false,
+                "internalType": "uint256",
+                "name": "time",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "reason",
+                "type": "string"
+            }
+        ],
+        "name": "StallClosed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "stallId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "string",
                 "name": "name",
                 "type": "string"
@@ -273,6 +317,11 @@ const contractABI = [
                 "type": "uint256"
             },
             {
+                "internalType": "enum CCNCarnival2025.Status",
+                "name": "status",
+                "type": "uint8"
+            },
+            {
                 "internalType": "bool",
                 "name": "withdrawn",
                 "type": "bool"
@@ -362,6 +411,11 @@ const contractABI = [
                 "type": "uint256"
             },
             {
+                "internalType": "enum CCNCarnival2025.Status",
+                "name": "status",
+                "type": "uint8"
+            },
+            {
                 "internalType": "bool",
                 "name": "withdrawn",
                 "type": "bool"
@@ -418,11 +472,19 @@ async function loadStalls() {
         const div = document.createElement('div');
         div.className = 'stall';
         let paymentsHtml = '';
-        // Only show payments if the connected user is the owner
+        let ownerActionsHtml = '';
         let accounts = [];
         try {
             accounts = await web3.eth.getAccounts();
-        } catch {}
+        } catch { }
+        // Status: 0=Open, 1=ClosedByOwner, 2=ClosedByTime, 3=Withdrawn
+        let statusText = '';
+        let statusColor = '';
+        if (s[5] == '0') { statusText = 'Open'; statusColor = 'green'; }
+        else if (s[5] == '1' || s[5] == '2') { statusText = 'Closed'; statusColor = 'red'; }
+        else if (s[5] == '3') { statusText = 'Withdrawn'; statusColor = 'goldenrod'; }
+
+        // Only show payments and owner actions if the connected user is the owner
         if (accounts.length > 0 && accounts[0].toLowerCase() === s[0].toLowerCase()) {
             // Fetch payers and their payments
             const payers = await contract.methods.getPayers(i).call();
@@ -430,24 +492,31 @@ async function loadStalls() {
                 paymentsHtml = '<div class="payments"><b>Payments:</b><ul>';
                 for (const payer of payers) {
                     const amount = await contract.methods.getPayment(i, payer).call();
-                    paymentsHtml += `<li>${payer}: ${web3.utils.fromWei(amount, 'ether')} ETH</li>`;
+                    paymentsHtml += `<li>${payer}: ${web3.utils.fromWei(amount, 'ether')} ETH <button onclick="refundStall(${i}, '${payer}')">Refund</button></li>`;
                 }
                 paymentsHtml += '</ul></div>';
             } else {
                 paymentsHtml = '<div class="payments"><b>Payments:</b> None</div>';
             }
+            // Owner actions: closeStall if open
+            if (s[5] == '0') {
+                ownerActionsHtml += `<button onclick="closeStall(${i})">Close Stall</button>`;
+            }
         }
+
         div.innerHTML = `<h3>${s[1]}</h3>
-      <p><b>Owner:</b> ${s[0]}</p>
-      <p><b>Duration:</b> ${['Friday', 'Friday & Saturday', 'Friday, Saturday & Sunday'][s[2]]}</p>
-      <p><b>Total Funds:</b> ${web3.utils.fromWei(s[3], 'ether')} ETH</p>
-      <p><b>Withdraw Time:</b> ${new Date(s[4] * 1000).toLocaleString()}</p>
-      <p><b>Withdrawn:</b> ${s[5] ? 'Yes' : 'No'}</p>
-      ${paymentsHtml}
-      <div class="stall-actions">
-        <button onclick="payStall(${i})">Pay</button>
-        <button onclick="withdrawStall(${i})">Withdraw</button>
-      </div>`;
+	  <p><b>Owner:</b> ${s[0]}</p>
+	  <p><b>Status:</b> <span style="color:${statusColor};font-weight:bold;">${statusText}</span></p>
+	  <p><b>Duration:</b> ${['Friday', 'Friday & Saturday', 'Friday, Saturday & Sunday'][s[2]]}</p>
+	  <p><b>Total Funds:</b> ${web3.utils.fromWei(s[3], 'ether')} ETH</p>
+	  <p><b>Withdraw Time:</b> ${new Date(s[4] * 1000).toLocaleString()}</p>
+	  <p><b>Withdrawn:</b> ${s[6] ? 'Yes' : 'No'}</p>
+	  ${paymentsHtml}
+	  <div class="stall-actions">
+		<button onclick="payStall(${i})">Pay</button>
+		<button onclick="withdrawStall(${i})">Withdraw</button>
+		${ownerActionsHtml}
+	  </div>`;
         stallList.appendChild(div);
     }
 }
@@ -464,6 +533,23 @@ window.payStall = async (stallId) => {
 window.withdrawStall = async (stallId) => {
     const accounts = await web3.eth.getAccounts();
     contract.methods.withdraw(stallId).send({ from: accounts[0] })
+        .on('receipt', loadStalls)
+        .on('error', err => alert(err.message));
+};
+
+window.refundStall = async (stallId, payer) => {
+    const amount = prompt('Enter amount in ETH to refund to ' + payer + ':');
+    if (!amount) return;
+    const accounts = await web3.eth.getAccounts();
+    contract.methods.refund(stallId, payer, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] })
+        .on('receipt', loadStalls)
+        .on('error', err => alert(err.message));
+};
+
+window.closeStall = async (stallId) => {
+    if (!confirm('Are you sure you want to close this stall?')) return;
+    const accounts = await web3.eth.getAccounts();
+    contract.methods.closeStall(stallId).send({ from: accounts[0] })
         .on('receipt', loadStalls)
         .on('error', err => alert(err.message));
 };
