@@ -123,6 +123,31 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "rater",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint8",
+						"name": "rating",
+						"type": "uint8"
+					}
+				],
+				"name": "StallRated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "owner",
 						"type": "address"
 					},
@@ -176,6 +201,30 @@
 						"type": "uint256"
 					}
 				],
+				"name": "getAverageRating",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "avgRating",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ratingsCount",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					}
+				],
 				"name": "getPayers",
 				"outputs": [
 					{
@@ -206,6 +255,30 @@
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "getRating",
+				"outputs": [
+					{
+						"internalType": "uint8",
+						"name": "",
+						"type": "uint8"
 					}
 				],
 				"stateMutability": "view",
@@ -284,6 +357,24 @@
 				"name": "payStall",
 				"outputs": [],
 				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "stallId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint8",
+						"name": "rating",
+						"type": "uint8"
+					}
+				],
+				"name": "rateStall",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -409,6 +500,16 @@
 						"internalType": "bool",
 						"name": "withdrawn",
 						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ratingsSum",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "ratingsCount",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -441,7 +542,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"CCNProjectV3.sol": "CCNCarnival2025"
+			"CCNProjectV4.sol": "CCNCarnival2025"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -455,12 +556,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"CCNProjectV3.sol": {
-			"keccak256": "0xe73e3ec0c83a1a09df47cc451693ad8f4e741f13d97c10a793e73029d4bc86ab",
+		"CCNProjectV4.sol": {
+			"keccak256": "0x478e651b68b418ae34160f80fa9fc758a92c79a22ccb532e5f3cf67f47eff5e8",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f87d0ba1ef3f8be643e882bd0bccd5ceba9b0db136c8fec7af9f331c9520c0cd",
-				"dweb:/ipfs/QmQjgJBDLP3cMS6BH2nYdyGM5s687r6Pfi9fmS9qmKAS6H"
+				"bzz-raw://4b394c7be6a144d15997862975f9c06547a32660df17f5fd3c3c626e407c4dfa",
+				"dweb:/ipfs/QmRkisGRt9LgPecM8MKDC3766YcpQxM2nDeHpfqhAM9tae"
 			]
 		}
 	},
