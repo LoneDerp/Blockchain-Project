@@ -169,7 +169,20 @@
 			},
 			{
 				"inputs": [],
-				"name": "carnivalStart",
+				"name": "CARNIVAL_START",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "ONE_DAY",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -326,21 +339,8 @@
 					},
 					{
 						"internalType": "bool",
-						"name": "withdrawn",
+						"name": "isWithdrawn",
 						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "oneDay",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -460,65 +460,6 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "stalls",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "enum CCNCarnival2025.Duration",
-						"name": "duration",
-						"type": "uint8"
-					},
-					{
-						"internalType": "uint256",
-						"name": "totalFunds",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "withdrawTime",
-						"type": "uint256"
-					},
-					{
-						"internalType": "enum CCNCarnival2025.Status",
-						"name": "status",
-						"type": "uint8"
-					},
-					{
-						"internalType": "bool",
-						"name": "withdrawn",
-						"type": "bool"
-					},
-					{
-						"internalType": "uint256",
-						"name": "ratingsSum",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "ratingsCount",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
 						"name": "stallId",
 						"type": "uint256"
 					}
@@ -542,7 +483,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"CCNProjectV4.sol": "CCNCarnival2025"
+			"CCNProjectV5.sol": "CCNCarnival2025"
 		},
 		"evmVersion": "prague",
 		"libraries": {},
@@ -556,12 +497,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"CCNProjectV4.sol": {
-			"keccak256": "0x478e651b68b418ae34160f80fa9fc758a92c79a22ccb532e5f3cf67f47eff5e8",
+		"CCNProjectV5.sol": {
+			"keccak256": "0xdacb6dc39a53b303b052ef147bca3a5a81484e659c8b48ab8591bc034bf70cae",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4b394c7be6a144d15997862975f9c06547a32660df17f5fd3c3c626e407c4dfa",
-				"dweb:/ipfs/QmRkisGRt9LgPecM8MKDC3766YcpQxM2nDeHpfqhAM9tae"
+				"bzz-raw://ee604744822db3b93064dd08c30551325d27f884334028265f42774f2098f4e7",
+				"dweb:/ipfs/QmPAdekcAKmthbqsuFaSRK45uZUyuLRroQqGLGxrSZ59Xr"
 			]
 		}
 	},
