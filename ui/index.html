@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CCN Carnival 2025 Stalls</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>CCN Carnival 2025 Stalls</h1>
+      <button id="connectBtn">Connect MetaMask</button>
+      <section id="register">
+        <h2>Register Stall</h2>
+        <form id="registerForm">
+          <input type="text" id="stallName" placeholder="Stall Name" required />
+          <select id="stallDuration">
+            <option value="0">Friday</option>
+            <option value="1">Friday & Saturday</option>
+            <option value="2">Friday, Saturday & Sunday</option>
+          </select>
+          <button type="submit">Register</button>
+        </form>
+      </section>
+      <section id="stalls">
+        <h2>Stalls</h2>
+        <div id="stallList"></div>
+      </section>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
